@@ -8,9 +8,10 @@ variable "vpc_cidr" {
   default = "10.50.0.0/16"
 }
 
-variable "public_subnet_cidr" {
-  type    = string
-  default = "10.50.1.0/24"
+variable "public_subnet_cidrs" {
+  description = "CIDR blocks for public subnets"
+  type        = list(string)
+  default     = ["10.50.1.0/24", "10.50.2.0/24"]
 }
 
 variable "instance_type" {
@@ -67,13 +68,66 @@ variable "db_name" {
   default = "kunals"
 }
 
-variable "ssh_public_key" {
-  type      = string
-  sensitive = false
-  default   = ""
+variable "db_identifier" {
+  description = "DB identifier"
+  type        = string
+  default     = "kunals-postgres-db"
+}
+
+variable "db_subnet_group_name" {
+  description = "Subnet group name for DB"
+  type        = string
+  default     = "tf-db-subnet-group"
+}
+
+variable "s3_bucket_name" {
+  description = "Name of the S3 bucket to use for CI artifacts"
+  type        = string
 }
 
 variable "ec2_name" {
   type    = string
   default = "tf-web-ec2"
+}
+
+variable "iam_role_name" {
+  description = "IAM role name to attach to instance"
+  type        = string
+  default     = "s3-fullaccess-kunal"
+}
+
+variable "iam_instance_profile_name" {
+  description = "Instance profile name"
+  type        = string
+  default     = "s3-fullaccess-kunal-instance-profile"
+}
+
+variable "web_sg_name" {
+  type    = string
+  default = "tf-web-sg"
+}
+
+variable "db_sg_name" {
+  type    = string
+  default = "tf-db-sg"
+}
+
+variable "eip_name" {
+  type    = string
+  default = "tf-web-eip"
+}
+
+variable "rt_name" {
+  type    = string
+  default = "tf-public-rt"
+}
+
+variable "vpc_name" {
+  type    = string
+  default = "tf-vpc"
+}
+
+variable "igw_name" {
+  type    = string
+  default = "tf-igw"
 }
