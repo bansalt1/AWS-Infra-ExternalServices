@@ -15,7 +15,7 @@ tags = {
 }
 
 # DB vars
-db_instance_class    = "db.t3.micro"
+db_instance_class    = "db.t3.xlarge"
 db_allocated_storage = 20
 db_username          = "postgres"
 db_password          = ""  #Input your DB password
