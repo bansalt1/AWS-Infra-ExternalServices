@@ -18,9 +18,8 @@ tags = {
 db_instance_class    = "db.t3.micro"
 db_allocated_storage = 20
 db_username          = "postgres"
-db_password          = "Iamdb123"
+db_password          = ""  #Input your DB password
 db_name              = "kunals"
 
 # EC2 config
-ec2_name       = "ubuntu-kunal"
-ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC..."  # put your real public key
+ec2_name       = "tfe-aws-docker-es"
