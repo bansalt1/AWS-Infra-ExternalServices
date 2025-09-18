@@ -1,5 +1,5 @@
 aws_region   = "ap-south-1"
-environment  = "dev2"
+environment  = ""
 
 # Networking
 vpc_cidr            = "10.60.0.0/16"
@@ -25,11 +25,11 @@ db_allocated_storage = 20
 db_engine            = "postgres"
 db_engine_version    = "15.8"
 db_username          = "postgres"
-db_password          = "Iamdb123"
+db_password          = ""
 db_name              = "kunals"
 
 # S3
-s3_bucket_prefix = "kunal-test-docker-fdo"
+s3_bucket_prefix = "ks-test-docker-fdo"
 
 # IAM
 iam_role_name               = "s3-fullaccess-kunal"
