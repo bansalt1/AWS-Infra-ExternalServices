@@ -1,45 +1,36 @@
-aws_region = "ap-south-1"
+aws_region   = "ap-south-1"
+environment  = "dev2"
 
 # Networking
-vpc_cidr           = "10.50.0.0/16"
-public_subnet_cidrs = ["10.50.1.0/24", "10.50.2.0/24"]
+vpc_cidr            = "10.60.0.0/16"
+public_subnet_cidrs = ["10.60.1.0/24", "10.60.2.0/24"]
 
 # EC2
 instance_type = "t3.xlarge"
 disk_size_gb  = 50
-ec2_name      = "tfe-aws-docker-es"
 
-# Hosted zone / DNS
+# Hosted zone
 hosted_zone_name = "tf-support.hashicorpdemo.com"
-record_name      = "ks-docker-es-ci"
 
 # Tags
 tags = {
-  project     = "aws-tf"
-  environment = "dev"
-  owner       = "kunal"
+  project     = "aws-tf1"
+  environment = "dev1"
+  owner       = "kunal1"
 }
 
 # DB
-db_instance_class     = "db.t3.xlarge"
-db_allocated_storage  = 20
-db_username           = "postgres"
-db_password           = "" # Password for database
-db_name               = "kunals"
-db_identifier         = "kunals-postgres-db"
-db_subnet_group_name  = "tfe-db-subnet-group"
+db_instance_class    = "db.t3.xlarge"
+db_allocated_storage = 20
+db_engine            = "postgres"
+db_engine_version    = "15.8"
+db_username          = "postgres"
+db_password          = "Iamdb123"
+db_name              = "kunals"
 
 # S3
-s3_bucket_name = "kunal-test-docker-fdo"
+s3_bucket_prefix = "kunal-test-docker-fdo"
 
 # IAM
-iam_role_name              = "s3-fullaccess-kunal"
-iam_instance_profile_name  = "s3-fullaccess-ks-instance-profile"
-
-# Resource names
-web_sg_name = "tf-web-sg"
-db_sg_name  = "tf-db-sg"
-eip_name    = "tf-web-eip"
-rt_name     = "tf-public-rt"
-vpc_name    = "tf-vpc"
-igw_name    = "tf-igw"
+iam_role_name               = "s3-fullaccess-kunal"
+iam_instance_profile_prefix = "s3-fullaccess-ks-instance-profile"
