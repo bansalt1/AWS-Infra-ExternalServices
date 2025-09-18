@@ -1,5 +1,19 @@
 locals {
+  env       = var.environment
   zone_name = endswith(var.hosted_zone_name, ".") ? var.hosted_zone_name : "${var.hosted_zone_name}."
+
+  vpc_name              = "tf-vpc-${local.env}"
+  igw_name              = "tf-igw-${local.env}"
+  rt_name               = "tf-public-rt-${local.env}"
+  web_sg_name           = "tf-web-sg-${local.env}"
+  db_sg_name            = "tf-db-sg-${local.env}"
+  eip_name              = "tf-web-eip-${local.env}"
+  ec2_name              = "tfe-aws-docker-${local.env}"
+  db_identifier         = "kunals-postgres-db-${local.env}"
+  db_subnet_group_name  = "tfe-db-subnet-group-${local.env}"
+  s3_bucket_name        = "${var.s3_bucket_prefix}-${local.env}"
+  iam_instance_profile  = "${var.iam_instance_profile_prefix}-${local.env}"
+  record_name           = "ks-docker-es-ci-${local.env}"
 }
 
 # Fetch available AZs
@@ -10,7 +24,7 @@ data "aws_availability_zones" "available" {
 # Latest Ubuntu AMI
 data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["099720109477"] # Canonical
+  owners      = ["099720109477"]
 
   filter {
     name   = "name"
@@ -28,13 +42,13 @@ resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags                 = merge(var.tags, { Name = var.vpc_name })
+  tags                 = merge(var.tags, { Name = local.vpc_name })
 }
 
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
-  tags   = merge(var.tags, { Name = var.igw_name })
+  tags   = merge(var.tags, { Name = local.igw_name })
 }
 
 # Public Subnets
@@ -46,10 +60,10 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
   availability_zone       = data.aws_availability_zones.available.names[count.index]
 
-  tags = merge(var.tags, { Name = "tfe-public-subnet-${count.index + 1}" })
+  tags = merge(var.tags, { Name = "tfe-public-subnet-${local.env}-${count.index + 1}" })
 }
 
-# Route Table for Public Subnets
+# Route Table
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -58,10 +72,9 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.igw.id
   }
 
-  tags = merge(var.tags, { Name = var.rt_name })
+  tags = merge(var.tags, { Name = local.rt_name })
 }
 
-# Associate subnets with route table
 resource "aws_route_table_association" "public_assoc" {
   count = length(aws_subnet.public[*].id)
 
@@ -71,7 +84,7 @@ resource "aws_route_table_association" "public_assoc" {
 
 # Security Group for Web
 resource "aws_security_group" "web_sg" {
-  name        = var.web_sg_name
+  name        = local.web_sg_name
   description = "Allow SSH/HTTP/HTTPS"
   vpc_id      = aws_vpc.main.id
 
@@ -100,19 +113,18 @@ resource "aws_security_group" "web_sg" {
   }
 
   egress {
-    description = "All egress"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(var.tags, { Name = var.web_sg_name })
+  tags = merge(var.tags, { Name = local.web_sg_name })
 }
 
 # DB Security Group
 resource "aws_security_group" "db_sg" {
-  name        = var.db_sg_name
+  name        = local.db_sg_name
   description = "Allow Postgres from web instances"
   vpc_id      = aws_vpc.main.id
 
@@ -131,16 +143,16 @@ resource "aws_security_group" "db_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(var.tags, { Name = var.db_sg_name })
+  tags = merge(var.tags, { Name = local.db_sg_name })
 }
 
-# IAM role already exists
+# IAM
 data "aws_iam_role" "existing_s3_role" {
   name = var.iam_role_name
 }
 
 resource "aws_iam_instance_profile" "web_profile" {
-  name = var.iam_instance_profile_name
+  name = local.iam_instance_profile
   role = data.aws_iam_role.existing_s3_role.name
 }
 
@@ -168,13 +180,13 @@ resource "aws_instance" "web" {
               chmod 600 /home/ubuntu/.ssh/authorized_keys
               EOF
 
-  tags = merge(var.tags, { Name = var.ec2_name })
+  tags = merge(var.tags, { Name = local.ec2_name })
 }
 
-# Elastic IP for web instance
+# Elastic IP
 resource "aws_eip" "web_eip" {
   domain = "vpc"
-  tags   = merge(var.tags, { Name = var.eip_name })
+  tags   = merge(var.tags, { Name = local.eip_name })
 }
 
 resource "aws_eip_association" "web_eip_assoc" {
@@ -182,18 +194,18 @@ resource "aws_eip_association" "web_eip_assoc" {
   allocation_id = aws_eip.web_eip.id
 }
 
-# RDS resources
+# RDS
 resource "aws_db_subnet_group" "db_subnets" {
-  name       = var.db_subnet_group_name
+  name       = local.db_subnet_group_name
   subnet_ids = aws_subnet.public[*].id
 
-  tags = merge(var.tags, { Name = var.db_subnet_group_name })
+  tags = merge(var.tags, { Name = local.db_subnet_group_name })
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier              = var.db_identifier
-  engine                  = "postgres"
-  engine_version          = "15.8"
+  identifier              = local.db_identifier
+  engine                  = var.db_engine
+  engine_version          = var.db_engine_version
   allocated_storage       = var.db_allocated_storage
   instance_class          = var.db_instance_class
   db_name                 = var.db_name
@@ -207,15 +219,15 @@ resource "aws_db_instance" "postgres" {
   storage_encrypted       = true
   apply_immediately       = true
 
-  tags = merge(var.tags, { Name = var.db_identifier })
+  tags = merge(var.tags, { Name = local.db_identifier })
 }
 
-# S3 bucket
+# S3
 resource "aws_s3_bucket" "ci_bucket" {
-  bucket        = var.s3_bucket_name
+  bucket        = local.s3_bucket_name
   force_destroy = true
 
-  tags = merge(var.tags, { Name = var.s3_bucket_name })
+  tags = merge(var.tags, { Name = local.s3_bucket_name })
 }
 
 # Route53
@@ -226,7 +238,7 @@ data "aws_route53_zone" "target" {
 
 resource "aws_route53_record" "a_record" {
   zone_id = data.aws_route53_zone.target.zone_id
-  name    = "${var.record_name}.${chomp(data.aws_route53_zone.target.name)}"
+  name    = "${local.record_name}.${chomp(data.aws_route53_zone.target.name)}"
   type    = "A"
   ttl     = 300
   records = [aws_eip.web_eip.public_ip]
