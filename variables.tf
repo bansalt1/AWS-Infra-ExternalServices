@@ -3,131 +3,76 @@ variable "aws_region" {
   default = "ap-south-1"
 }
 
+variable "environment" {
+  description = "Environment name (e.g. dev1, dev2, staging, prod)"
+  type        = string
+}
+
 variable "vpc_cidr" {
-  type    = string
-  default = "10.50.0.0/16"
+  type = string
 }
 
 variable "public_subnet_cidrs" {
   description = "CIDR blocks for public subnets"
   type        = list(string)
-  default     = ["10.50.1.0/24", "10.50.2.0/24"]
 }
 
 variable "instance_type" {
-  type    = string
-  default = "t3.xlarge"
+  type = string
 }
 
 variable "disk_size_gb" {
-  type    = number
-  default = 50
+  type = number
 }
 
 variable "hosted_zone_name" {
-  type    = string
-  default = "tf-support.hashicorpdemo.com"
-}
-
-variable "record_name" {
-  type    = string
-  default = "ksrepmd"
+  type = string
 }
 
 variable "tags" {
   type = map(string)
-  default = {
-    project     = "aws-tf"
-    environment = "dev"
-    owner       = "kunal"
-  }
 }
 
 variable "db_instance_class" {
-  type    = string
-  default = "db.t3.micro"
+  type = string
 }
 
 variable "db_allocated_storage" {
-  type    = number
-  default = 20
+  type = number
 }
 
 variable "db_username" {
+  type = string
+}
+
+variable "db_password" {
+  type = string
+}
+
+variable "db_name" {
+  type = string
+}
+
+variable "db_engine" {
   type    = string
   default = "postgres"
 }
 
-variable "db_password" {
-  type    = string
-  default = "Iamdb123"
+variable "db_engine_version" {
+  type = string
 }
 
-variable "db_name" {
-  type    = string
-  default = "kunals"
-}
-
-variable "db_identifier" {
-  description = "DB identifier"
+variable "s3_bucket_prefix" {
+  description = "Prefix for S3 bucket name, environment will be appended"
   type        = string
-  default     = "kunals-postgres-db"
-}
-
-variable "db_subnet_group_name" {
-  description = "Subnet group name for DB"
-  type        = string
-  default     = "tf-db-subnet-group"
-}
-
-variable "s3_bucket_name" {
-  description = "Name of the S3 bucket to use for CI artifacts"
-  type        = string
-}
-
-variable "ec2_name" {
-  type    = string
-  default = "tf-web-ec2"
 }
 
 variable "iam_role_name" {
   description = "IAM role name to attach to instance"
   type        = string
-  default     = "s3-fullaccess-kunal"
 }
 
-variable "iam_instance_profile_name" {
-  description = "Instance profile name"
+variable "iam_instance_profile_prefix" {
+  description = "Prefix for IAM instance profile name, environment will be appended"
   type        = string
-  default     = "s3-fullaccess-kunal-instance-profile"
-}
-
-variable "web_sg_name" {
-  type    = string
-  default = "tf-web-sg"
-}
-
-variable "db_sg_name" {
-  type    = string
-  default = "tf-db-sg"
-}
-
-variable "eip_name" {
-  type    = string
-  default = "tf-web-eip"
-}
-
-variable "rt_name" {
-  type    = string
-  default = "tf-public-rt"
-}
-
-variable "vpc_name" {
-  type    = string
-  default = "tf-vpc"
-}
-
-variable "igw_name" {
-  type    = string
-  default = "tf-igw"
 }
