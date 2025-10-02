@@ -16,7 +16,7 @@ hosted_zone_name = "tf-support.hashicorpdemo.com"
 tags = {
   project     = "aws-tf1"
   environment = "dev1"
-  owner       = "kunal1"
+  owner       = "Tarun1"
 }
 
 # DB
@@ -26,11 +26,11 @@ db_engine            = "postgres"
 db_engine_version    = "15.8"
 db_username          = "postgres"
 db_password          = ""
-db_name              = "kunals"
+db_name              = "Taruns"
 
 # S3
 s3_bucket_prefix = "ks-test-docker-fdo"
 
 # IAM
-iam_role_name               = "s3-fullaccess-kunal"
+iam_role_name               = "s3-fullaccess-Tarun"
 iam_instance_profile_prefix = "s3-fullaccess-ks-instance-profile"
